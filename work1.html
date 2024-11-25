@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แสดงข้อสอบ</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .Ans {
+            color: violet;
+        }
+
+        header {
+            background-color: aqua;
+            font-size: 5em;
+            text-align: center;
+        }
+
+        .container {
+            margin-left: 15px;
+            padding-left: 15px;
+        }
+
+        .question {
+            margin: 10px 0px 10px 0px;
+        }
+
+        @media screen and (max-width: 600px) {
+            header {
+            background-color: aqua;
+            font-size: 2em;
+            text-align: center;
+        }
+        .container {
+            margin-left: 5px;
+            padding-left: 5px;
+        }
+        }
+    </style>
+</head>
+
+<body>
+    <header>ข้อสอบ</header>
+    <a href="index.html"></a>
+    <div class="container">
+        <div id="quiz-container"></div>
+        <div class="Ans"></div>
+        <div class="Btn"></div>
+        <p class="result"></p>
+    </div>
+
+
+
+
+    <script>
+        $(document).ready(function () {
+            // โหลดข้อมูล JSON
+            $.getJSON('quiz.json', function (data) {
+                var quiz = data.quiz;
+                var quizHTML = '';
+                var ans = ' ';
+                var button = ' ';
+
+
+
+                // สร้าง HTML สำหรับข้อสอบแต่ละข้อ
+                $.each(quiz, function (index, question) {
+                    quizHTML += '<div class="question">';
+                    quizHTML += '<p>' + question.question + '</p>';
+                    $.each(question.options, function (i, option) {
+                        quizHTML += '<label><input type="radio" name="question' + index + '" value="' + option + '"> ' + option + '</label><br>';
+
+                    });
+
+                    quizHTML += '</div>';
+                    ans += '<div class="Ans"><p>ข้อที่' + question.Num + 'คำตอบที่ถูกต้อง: ' + question.answer + '</p></div>';
+
+                    // ใส่ข้อมูล HTML ลงใน #quiz-container
+
+
+                    $('#quiz-container').html(quizHTML);
+                    $('.Ans').html(ans);
+
+
+
+                });
+                button += '<button class="btn btn-primary">เฉลย</button>'
+                $(".Ans").hide()
+                $(".Btn").click(function () {
+                    $(".Ans").show();
+                });
+                $('.Btn').html(button);
+
+
+                $('.Btn').click(function () {
+                    var score = 0;
+                    $.getJSON('quiz.json', function (data) {
+                        var quiz = data.quiz;
+
+                        // ตรวจคำตอบแต่ละข้อ
+                        $.each(quiz, function (index, question) {
+                            // หาคำตอบที่ถูกต้อง
+                            var selectedAnswer = $('input[name="question' + index + '"]:checked').val();
+                            if (selectedAnswer === question.answer) {
+                                score++; // เพิ่มคะแนนถ้าคำตอบถูกต้อง
+                            }
+                        });
+                        $('.result').html('คุณได้คะแนน: ' + score + '/' + quiz.length);
+
+                    });
+                });
+            });
+        });
+
+    </script>
+</body>
+
+</html>
